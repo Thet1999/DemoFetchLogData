@@ -103,13 +103,18 @@ public class FetchLogDataService {
 				            //   System.out.println(diff);
 				            //   System.out.println(smallestDiffSeconds);
 						        System.out.println(" Date Time - ---> " + rec.getLoggingDateTime()  );
-
+						        String    recString = "";
 				                if (diff < smallestDiffSeconds) {
 				                    smallestDiffSeconds = diff;
-				                    if (rec.getAuthenticationType().equals("OTP")) {
-				                    	smallestDiffSeconds = Long.MAX_VALUE;
-				                    }
+				                    try (InputStream inputStream = rec.getDeviceInfo().getBinaryStream()) {
+						         recString = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8); }
+ 				                    if (recString.equals("{\"__hashCodeCalc\":false}")) {
+ 				                    	smallestDiffSeconds = Long.MAX_VALUE;
+ 				                    	recString = "";
+ 				                    	continue;
+ 				                    }
 				                    nearest = rec;
+				                    break;
 				                }
 				            }
 				        }
@@ -121,7 +126,7 @@ public class FetchLogDataService {
 			            logRecordOutput.setDeviceInfo(deviceInfoJson);
 			            logRecordOutput.setLogRecordDateTime(nearest.getLoggingDateTime());
 			                		
- 			        System.out.println(" Device Info ---> " + deviceInfoJson  );
+ 			        System.out.println(" Device Info ---> " + deviceInfoJson + "\n" );
  			        
 
 
