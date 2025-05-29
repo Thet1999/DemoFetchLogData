@@ -16,6 +16,7 @@ public class LogRecordOutput {
 	
 	String inputTrsData ;
 	LocalDateTime logRecordDateTime;
+	int index; 
 	String  deviceInfo;
 	
 

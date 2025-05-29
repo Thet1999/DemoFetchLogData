@@ -36,8 +36,10 @@ public class FetchLogDataService {
 
 	public List<LogRecordOutput> fetchAll(List<String> hostRefNList) throws SQLException {
 		List<LogRecordOutput> logRecOutputList = new ArrayList<LogRecordOutput>();
+		int i = 1;
 		for (String hostRefN : hostRefNList) {
 			LogRecordOutput logRecordOutput = fetchData(hostRefN);
+			logRecordOutput.setIndex(i++);
 			logRecOutputList.add(logRecordOutput);
 		}
 		return logRecOutputList;
