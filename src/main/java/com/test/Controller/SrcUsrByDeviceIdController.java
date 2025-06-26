@@ -39,14 +39,16 @@ public class SrcUsrByDeviceIdController {
 		}
 	}
     
-    	/* 
-      	{
-    	  "searchHardwareID": "ABC123XYZ",
-    	  "fromDate": "01JUN2025",
-    	  "toDate": "02JUN2025",
-    	  "rowCount": 20
-    	}  
-    	*/
+	/*Payload
+	{
+		  "searchHardwareID": "52513ab03f6988f5",
+		  "fromDate": "01JUN2025",
+		  "toDate": "20JUN2025",
+		  "rowCount": 10
+		}
+		
+		*/
+
     
 
 
