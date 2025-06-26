@@ -17,6 +17,7 @@ public class LogRecFetchController {
 
     @Autowired
     private FetchLogDataService fetchTransService;  
+    
     @PostMapping("/fetch")
     public ResponseEntity< List<LogRecordOutput>> fetchLogRecord(@RequestBody Map<String, List<String>> inputHostRef  ) {
         try {
@@ -28,4 +29,6 @@ public class LogRecFetchController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    
 }
