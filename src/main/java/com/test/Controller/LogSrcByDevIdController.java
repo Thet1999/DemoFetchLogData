@@ -10,29 +10,30 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.test.model.entity.LogIdOutputSrcByDevice;
-import com.test.model.entity.SearchRequestByDeviceId;
-import com.test.model.service.SearchUsrByDeviceInfo;
+import com.test.api.input.InputForLogSrcByDevId;
+import com.test.api.output.DataOutputSrcByDevId;
+import com.test.model.entity.LogRecordSrcByDevId;
+import com.test.model.service.SearchLogByDevIdService;
 
 
 @RestController
-@RequestMapping("/log/bydeviceid")
-public class SrcUsrByDeviceIdController {
+@RequestMapping("/log/search")
+public class LogSrcByDevIdController {
 	
 	@Autowired
-    SearchUsrByDeviceInfo searchUsrByDevinfo ;
+    SearchLogByDevIdService searchUsrByDevinfo ;
     
-	@PostMapping("/searchuser")
-	public ResponseEntity<List<LogIdOutputSrcByDevice>> searchUsrByDeviceId(@RequestBody SearchRequestByDeviceId request) {
+	@PostMapping("/bydeviceid")
+	public ResponseEntity<DataOutputSrcByDevId> searchUsrByDeviceId(@RequestBody InputForLogSrcByDevId request) {
 		try {
 			String searchHardwareID = request.getSearchHardwareID();
 			String fromDate = request.getFromDate();
 			String toDate = request.getToDate();
 			int rowCount = request.getRowCount();
 
-			List<LogIdOutputSrcByDevice> logInfo = searchUsrByDevinfo.searchDeviceInfo(searchHardwareID, fromDate, toDate,
+			DataOutputSrcByDevId dataOutpurSrcByDevId = searchUsrByDevinfo.searchDeviceInfo(searchHardwareID, fromDate, toDate,
 					rowCount);
-			return ResponseEntity.ok(logInfo);
+			return ResponseEntity.ok(dataOutpurSrcByDevId);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.internalServerError().build();

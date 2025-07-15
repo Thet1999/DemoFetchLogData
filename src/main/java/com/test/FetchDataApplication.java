@@ -7,11 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.test.model.service.FetchLogDataService;
-import com.test.model.service.SearchUsrByDeviceInfo;
+import com.test.model.service.SearchLogByDevIdService;
 
-@SpringBootApplication
+@SpringBootApplication 
 public class FetchDataApplication implements CommandLineRunner {
 
     private final List<String> refList2 = List.of(
@@ -26,7 +27,7 @@ public class FetchDataApplication implements CommandLineRunner {
     private FetchLogDataService fetchTrsService;
 
     @Autowired
-    private SearchUsrByDeviceInfo searchUsrByDevinfo;
+    private SearchLogByDevIdService searchUsrByDevinfo;
 
     public static void main(String[] args) {
         SpringApplication.run(FetchDataApplication.class, args);

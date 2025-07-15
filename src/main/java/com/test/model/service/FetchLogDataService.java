@@ -20,8 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.test.model.entity.LogRecord;
-import com.test.model.entity.LogRecordOutput;
+import com.test.api.output.FraudLogRecOutput;
+import com.test.model.entity.FraudLogRecord;
 
 @Service
 public class FetchLogDataService {
@@ -34,21 +34,21 @@ public class FetchLogDataService {
 	private int dbPass;
 	private String sql = "SELECT TXNID, IDINITIATOR, DATINITIATION FROM admintxnunauthdata WHERE hostrefrenceno = ?";
 
-	public List<LogRecordOutput> fetchAll(List<String> hostRefNList) throws SQLException {
-		List<LogRecordOutput> logRecOutputList = new ArrayList<LogRecordOutput>();
+	public List<FraudLogRecOutput> fetchAll(List<String> hostRefNList) throws SQLException {
+		List<FraudLogRecOutput> logRecOutputList = new ArrayList<FraudLogRecOutput>();
 		int i = 1;
 		for (String hostRefN : hostRefNList) {
-			LogRecordOutput logRecordOutput = fetchData(hostRefN);
+			FraudLogRecOutput logRecordOutput = fetchData(hostRefN);
 			logRecordOutput.setIndex(i++);
 			logRecOutputList.add(logRecordOutput);
 		}
 		return logRecOutputList;
 	}
 
-	@Async
-	public LogRecordOutput fetchData(String hostRefN) throws SQLException {
+ 
+	public FraudLogRecOutput fetchData(String hostRefN) throws SQLException {
 		boolean found = false;
-        LogRecordOutput logRecordOutput = new LogRecordOutput();
+        FraudLogRecOutput logRecordOutput = new FraudLogRecOutput();
 
 
 		try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -75,7 +75,7 @@ public class FetchLogDataService {
 							+ " trunc(logging_datetime)= (?) and idtxn= ? ORDER BY LOGGING_DATETIME Desc   " ;
 					 try (PreparedStatement stmt2 = conn.prepareStatement(sql2)) {
 
-					List<LogRecord> records = new ArrayList<>();
+					List<FraudLogRecord> records = new ArrayList<>();
 					stmt2.setString(1, idInitiator);
 					stmt2.setDate(2, sqlDate);
 					stmt2.setString(3, txnId);
@@ -90,16 +90,16 @@ public class FetchLogDataService {
 					        if (blob != null) {
 					           // try (InputStream inputStream = blob.getBinaryStream()) {
 					            //    deviceInfoJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-					            records.add(new LogRecord(rs2DateTime,blob,authenticationType));
+					            records.add(new FraudLogRecord(rs2DateTime,blob,authenticationType));
 					            }
 					        }
 					        
 					    }
-				     LogRecord nearest = null;
+				     FraudLogRecord nearest = null;
 				        long smallestDiffSeconds = Long.MAX_VALUE;
 
 				        LocalDateTime inputDateTime = dateInitiation;  
-				        for (LogRecord rec : records) {
+				        for (FraudLogRecord rec : records) {
 				            if (!rec.getLoggingDateTime().isAfter(inputDateTime)) {  
 				                long diff = java.time.Duration.between(rec.getLoggingDateTime(), inputDateTime).getSeconds();
 				            //   System.out.println(diff);

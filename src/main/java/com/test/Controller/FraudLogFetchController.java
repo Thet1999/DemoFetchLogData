@@ -2,7 +2,7 @@ package com.test.Controller;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.test.model.entity.LogRecordOutput;
+import com.test.api.output.FraudLogRecOutput;
 import com.test.model.service.FetchLogDataService;
 
 import java.util.List;
@@ -13,16 +13,16 @@ import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/test/log")
-public class LogRecFetchController {
+public class FraudLogFetchController {
 
     @Autowired
     private FetchLogDataService fetchTransService;  
     
     @PostMapping("/fetch")
-    public ResponseEntity< List<LogRecordOutput>> fetchLogRecord(@RequestBody Map<String, List<String>> inputHostRef  ) {
+    public ResponseEntity< List<FraudLogRecOutput>> fetchLogRecord(@RequestBody Map<String, List<String>> inputHostRef  ) {
         try {
             List<String> hostRefList = inputHostRef.get("hostRefNo");
-            List<LogRecordOutput>  output = fetchTransService.fetchAll( hostRefList );
+            List<FraudLogRecOutput>  output = fetchTransService.fetchAll( hostRefList );
             return ResponseEntity.ok(output);
         } catch (Exception e) {
             e.printStackTrace();

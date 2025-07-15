@@ -1,19 +1,34 @@
 package com.test.model.entity;
 
 
-public class LogIdOutputSrcByDevice {
+public class LogRecordSrcByDevId {
     private String logIdRefNo;
     private String deviceName;
     private String hardwareId;
-    private String isFound = "_";
+    private Boolean isFound ;
     //  
-    public LogIdOutputSrcByDevice(String logIdRefNo, String deviceName, String hardwareId) {
+    public LogRecordSrcByDevId(String logIdRefNo, String deviceName, String hardwareId , Boolean isFound) {
         this.logIdRefNo = logIdRefNo;
         this.deviceName = deviceName;
         this.hardwareId = hardwareId;
+        this.isFound = isFound ;
     }
+    
+    
 
-     public LogIdOutputSrcByDevice() {
+     public Boolean getIsFound() {
+		return isFound;
+	}
+
+
+
+	public void setIsFound(Boolean isFound) {
+		this.isFound = isFound;
+	}
+
+
+
+	public LogRecordSrcByDevId() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -41,13 +56,7 @@ public class LogIdOutputSrcByDevice {
 		this.logIdRefNo = logIdRefNo;
 	}
 
-	public String getIsFound() {
-		return isFound;
-	}
-
-	public void setIsFound(String isFound) {
-		this.isFound = isFound;
-	}
+ 
 
 	
 }

@@ -1,12 +1,12 @@
-package com.test.model.entity;
+package com.test.api.input;
 
-public class SearchRequestByDeviceId {
+public class InputForLogSrcByDevId {
     private String searchHardwareID;
     private String fromDate;
     private String toDate;
     private int rowCount;
 
-    // Getters and Setters
+     
     public String getSearchHardwareID() {
         return searchHardwareID;
     }

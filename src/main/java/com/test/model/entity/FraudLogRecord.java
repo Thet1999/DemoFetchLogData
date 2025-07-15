@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LogRecord {
+public class FraudLogRecord {
 	
 	LocalDateTime loggingDateTime;
     Blob deviceInfo;

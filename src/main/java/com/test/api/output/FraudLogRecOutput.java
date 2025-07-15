@@ -1,4 +1,4 @@
-package com.test.model.entity;
+package com.test.api.output;
 
 import java.sql.Blob;
 import java.time.LocalDateTime;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LogRecordOutput {
+public class FraudLogRecOutput {
 	
 	String inputTrsData ;
 	LocalDateTime logRecordDateTime;

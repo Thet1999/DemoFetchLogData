@@ -1,5 +1,6 @@
 package com.test.model.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Blob;
@@ -14,18 +15,24 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.test.model.entity.LogIdOutputSrcByDevice;
-import com.test.model.entity.LogRecordOutput;
+import com.test.api.output.DataOutputSrcByDevId;
+import com.test.api.output.FraudLogRecOutput;
+import com.test.model.entity.LogRecordSrcByDevId;
 
 @Service
-public class SearchUsrByDeviceInfo {
+public class SearchLogByDevIdService {
 
     @Autowired
     private DataSource dataSource;
+
+	private Boolean TRUE;
 
     private static final String newRSALogQuery = 
         "SELECT * FROM ( " +
@@ -33,10 +40,18 @@ public class SearchUsrByDeviceInfo {
         "  ORDER BY logging_datetime DESC " +
         ") WHERE ROWNUM <= ?";
 
-    public List<LogIdOutputSrcByDevice > searchDeviceInfo(String searchHardwarId ,String fromDate, String toDate, int rowCount) throws Exception {
+	private static final Logger logger = LoggerFactory.getLogger(SearchLogByDevIdService.class);
+
+ 
+    public  DataOutputSrcByDevId searchDeviceInfo(String searchHardwarId ,String fromDate, String toDate, int rowCount) throws Exception {
         String deviceInfo = "";
 
-        List<LogIdOutputSrcByDevice> logRecordList  = new ArrayList<LogIdOutputSrcByDevice>();
+        System.out.println(" aaaa: ");
+        		
+        List<LogRecordSrcByDevId> logRecordList  = new ArrayList<LogRecordSrcByDevId>();
+        List<LogRecordSrcByDevId> foundLogRecordList  = new ArrayList<LogRecordSrcByDevId>();
+
+        DataOutputSrcByDevId  dataOutputSrcByDevId= new DataOutputSrcByDevId() ;
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(newRSALogQuery)) {
@@ -46,14 +61,23 @@ public class SearchUsrByDeviceInfo {
             stmt.setInt(3, rowCount);
 
             try (ResultSet rs = stmt.executeQuery()) {
-            	
+            	int foundDevIdCount = 0 ;
                 while (rs.next()) {
                     Blob blob = rs.getBlob("deviceinfo");
                     String logIdRefNo= rs.getString("IDREFERENCE") ;
                     if (blob != null) {
                         try (InputStream inputStream = blob.getBinaryStream()) {
-                            deviceInfo = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-
+                        	
+                        	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                        	byte[] buffer = new byte[1024]; // Read in 1KB chunks
+                        	int bytesRead;
+                        	while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        	    outputStream.write(buffer, 0, bytesRead);
+                        	}
+//                        	deviceInfo = outputStream.toString(StandardCharsets.UTF_8);
+//                            deviceInfo = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+                        	deviceInfo = outputStream.toString(StandardCharsets.UTF_8.name());
+                            
                             ObjectMapper mapper = new ObjectMapper();
                             Map<String, Object> mapedJson = mapper.readValue(deviceInfo, Map.class);
 
@@ -67,13 +91,22 @@ public class SearchUsrByDeviceInfo {
                           
                             System.out.println("DeviceName " + deviceName + "   LogIdRefNo " + logIdRefNo + "   " );
                             System.out.println("HardwareID " + hardwareID + "\n");
-                            System.out.flush();  
-                            
-                            LogIdOutputSrcByDevice logIdOutpuSrcByDevice = new LogIdOutputSrcByDevice();
+
+
+                            logger.info("Thread: {}", Thread.currentThread().getName());
+                            logger.info("✅ Found DeviceName: {}   LogIdRefNo: {}", deviceName, logIdRefNo);
+                            logger.info("✅ HardwareID: {}", hardwareID);
+                            logger.info("DeviceName: {}   LogIdRefNo: {}", deviceName, logIdRefNo);
+
+                        	dataOutputSrcByDevId.setFoundDeviceIdCount(  foundDevIdCount  );
+
+                            LogRecordSrcByDevId logIdOutpuSrcByDevice = new LogRecordSrcByDevId();
 
                             if (hardwareID.equals(searchHardwarId)) {
-                            	logIdOutpuSrcByDevice.setIsFound("TRUE");
-                                System.out.println("*** Found DeviceName: " + deviceName + " *** HardwareID: " + searchHardwarId + "\n");
+                            	logIdOutpuSrcByDevice.setIsFound(Boolean.TRUE);
+                            	foundDevIdCount ++ ;
+                            	dataOutputSrcByDevId.setFoundDeviceIdCount(  foundDevIdCount  );
+                               // System.out.println("*** Found DeviceName: " + deviceName + " *** HardwareID: " + searchHardwarId + "\n");
                             } 
                             
                             if (searchHardwarId != null) {
@@ -87,14 +120,20 @@ public class SearchUsrByDeviceInfo {
 
                             }
                             
+                            if( hardwareID.equals(searchHardwarId) ) {
+                            	foundLogRecordList.add(logIdOutpuSrcByDevice);
+                            	dataOutputSrcByDevId.setFoundLogRecordList(foundLogRecordList);
+                            }
                             
                             
                         }
                     }
                 }
             }
+            
+            dataOutputSrcByDevId.setLogOutputForSrcByDevId(logRecordList);
         }
-		return logRecordList;
+		return dataOutputSrcByDevId;
 
 
     }
